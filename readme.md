@@ -1,35 +1,44 @@
 # FATURA | Backend task
 
+This is authorization and authentication that is responsible for registering users to the system, login, and logout out of the system, and responsible add permission to users & roles
 
-this is task for backend eng at fatura
+## Authentication Phase
+
+How authentication work. i used jwt to auth users, user provide email,password,name and role > the server will validate the body of request then if it pass, server will create record fr this user then create two tokens **accessToken** & **refreshToken** why i used two
+type | accessToken | refreshToken |
+--- | --- | --- |
+expire | 30m | 1week |
+used | this used for authenticate for every request he is made | this is used when accessToken expire to get pair of accessToken & refreshToken then ut become in blacklist for secuirty
+
+![register process](images/register.png)
+
+---
+
+when client need data or want to make an action.
+it will make the request & send accessToken in the headers, so server can extract token , verify it if it verified then return result if not return 401
+
+![register process](images/clientneed.png)
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
+to run the app it is very easy, you can use docker-compose to run the app I used docker because I use MySQL as database & Redis for store refresh tokens
 
 ```bash
-pip install foobar
+docker-compose up
 ```
 
-## Usage
+## Testing
 
-```python
-import foobar
+i use jest & supertest run make unit test & write api test
+to run tests you can run one of the following commands
 
-# returns 'words'
-foobar.pluralize('word')
+```bash
+# run all tests for the whole app
+npm run test
 
-# returns 'geese'
-foobar.pluralize('goose')
+# run all tests of auth endpoints
+npm run test:auth
 
-# returns 'phenomenon'
-foobar.singularize('phenomena')
+# run all tests of product endpoints
+npm run test:product
 ```
-
-## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
-
-## License
-[MIT](https://choosealicense.com/licenses/mit/)
