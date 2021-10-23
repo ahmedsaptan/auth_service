@@ -1,12 +1,18 @@
 const jwt = require("jsonwebtoken");
 const createError = require("http-errors");
-require("dotenv").config()
+require("dotenv").config();
 const {
-  JWT_EXPIER_ACCESS_TOKEN = "1h",
-  JWT_EXPIER_REFRESH_TOKEN = "1y",
+  JWT_EXPIER_ACCESS_TOKEN = "30m",
+  JWT_EXPIER_REFRESH_TOKEN = "7d",
   JWT_ACCESS_TOKEN_SECRET = "HGFHKTY",
   JWT_REFRESH_TOKEN_SECRET = "GJHGJJK",
 } = process.env;
+console.table({
+  JWT_EXPIER_ACCESS_TOKEN,
+  JWT_EXPIER_REFRESH_TOKEN,
+  JWT_ACCESS_TOKEN_SECRET,
+  JWT_REFRESH_TOKEN_SECRET,
+});
 const client = require("../helpers/init_redis");
 
 const signAccessToken = (userId) => {

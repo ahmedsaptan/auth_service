@@ -27,6 +27,8 @@ to run the app it is very easy, you can use docker-compose to run the app I used
 docker-compose up
 ```
 
+server will run http://localhost:3000
+
 ## Testing
 
 i use jest & supertest run make unit test & write api test
@@ -42,3 +44,6 @@ npm run test:auth
 # run all tests of product endpoints
 npm run test:product
 ```
+
+##  Postman collection
+here is postman collection This site was built using [Postman Collection](https://www.getpostman.com/collections/8481f3e15ddcce98a1d2).

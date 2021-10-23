@@ -30,7 +30,7 @@ services:
     restart: unless-stopped
     env_file: ./.env
     ports:
-      - 3003:3000
+      - 3000:3000
     environment:
       - DB_HOST=my-sql-server
       - DB_USER=$MYSQLDB_USER
