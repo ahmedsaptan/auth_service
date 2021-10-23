@@ -281,3 +281,91 @@ describe("Put /api/v1/products", () => {
     expect(res.body).toHaveProperty("error");
   });
 });
+
+// test delete product endpoint.
+describe("Delete /api/v1/products", () => {
+  it("should not delete product user role admin", async () => {
+    const p = await models.Product.create({
+      title: "title",
+    });
+    const userData = await request(app).post("/api/v1/auth/register").send({
+      email: "ghfdtrrt@g.com",
+      password: "123456789",
+      name: "ahmad",
+      role: "admin",
+    });
+
+    const res = await request(app)
+      .delete(`/api/v1/products/${p.id}`)
+      .set("Authorization", `Bearer ${userData.body.accessToken}`)
+      .send({
+        title: "updated one",
+      });
+    expect(res.statusCode).toEqual(403);
+    expect(res.body).toHaveProperty("error");
+  });
+  it("should delete product user role super_admin", async () => {
+    const p = await models.Product.create({
+      title: "title",
+    });
+    const userData = await request(app).post("/api/v1/auth/register").send({
+      email: "jkklklkliyy656trft@g.com",
+      password: "123456789",
+      name: "ahmad",
+      role: "super_admin",
+    });
+
+    const res = await request(app)
+      .delete(`/api/v1/products/${p.id}`)
+      .set("Authorization", `Bearer ${userData.body.accessToken}`)
+      .send({
+        title: "updated one",
+      });
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toHaveProperty("product");
+  });
+  it("should not delete product user role user", async () => {
+    const p = await models.Product.create({
+      title: "title",
+    });
+    const userData = await request(app).post("/api/v1/auth/register").send({
+      email: "hjjkjkjkljkljkliouiouio@g.com",
+      password: "123456789",
+      name: "ahmad",
+      role: "user",
+    });
+
+    const res = await request(app)
+      .delete(`/api/v1/products/${p.id}`)
+      .set("Authorization", `Bearer ${userData.body.accessToken}`)
+      .send({
+        title: "updated one",
+      });
+    expect(res.statusCode).toEqual(403);
+    expect(res.body).toHaveProperty("error");
+  });
+  it("should return unauthorized.", async () => {
+    const p = await models.Product.create({
+      title: "title",
+    });
+
+    const res = await request(app).delete(`/api/v1/products/${p.id}`).send();
+    expect(res.statusCode).toEqual(401);
+    expect(res.body).toHaveProperty("error");
+  });
+  it("should return not found.", async () => {
+    const userData = await request(app).post("/api/v1/auth/register").send({
+      email: "yuyuyuyuyuyuyuyu@g.com",
+      password: "123456789",
+      name: "ahmad",
+      role: "super_admin",
+    });
+
+    const res = await request(app)
+      .delete(`/api/v1/products/ttyyk`)
+      .set("Authorization", `Bearer ${userData.body.accessToken}`)
+      .send();
+    expect(res.statusCode).toEqual(404);
+    expect(res.body).toHaveProperty("error");
+  });
+});
