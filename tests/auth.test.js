@@ -2,9 +2,7 @@ const request = require("supertest");
 const app = require("../app");
 const sequelize = require("../models");
 const { models } = sequelize;
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const { beforeAll } = require("@jest/globals");
+const { beforeAll, beforeEach } = require("@jest/globals");
 
 beforeAll(async () => {
   try {
@@ -24,10 +22,9 @@ beforeAll(async () => {
   }
 });
 
-afterAll((done) => {
+afterAll(() => {
   // Closing the DB connection allows Jest to exit successfully.
   sequelize.close();
-  done();
 });
 
 // test register endpoint.
@@ -235,106 +232,131 @@ describe("Post /api/v1/auth/login", () => {
 });
 
 // test refresh token endpoint.
-describe("Post /api/v1/auth/login", () => {
-  it("should login user succssfully", async () => {
-    await request(app).post("/api/v1/auth/register").send({
-      email: "ahmedlogin@g.com",
-      password: "123456789",
-      name: "ahmedlogin",
-      role: "user",
+describe("Post /api/v1/auth/refresh-token", () => {
+  it("should return accessToken & refreshToken  succssfully", async () => {
+    const registerResponse = await request(app)
+      .post("/api/v1/auth/register")
+      .send({
+        email: "login1@g.com",
+        password: "123456789",
+        name: "ahmedlogin",
+        role: "user",
+      });
+    const res = await request(app).post("/api/v1/auth/refresh-token").send({
+      refreshToken: registerResponse.body.refreshToken,
     });
-    const res = await request(app).post("/api/v1/auth/login").send({
-      email: "ahmedlogin@g.com",
-      password: "123456789",
-    });
-    expect(res.statusCode).toEqual(200);
+    expect(res.statusCode).toEqual(201);
     expect(res.body).toHaveProperty("accessToken");
     expect(res.body).toHaveProperty("refreshToken");
   });
 
   it("should return bad request no body", async () => {
-    const res = await request(app).post("/api/v1/auth/login").send({});
+    const res = await request(app).post("/api/v1/auth/refresh-token").send({});
     expect(res.statusCode).toEqual(400);
     expect(res.body).toHaveProperty("error");
   });
 
-  it("should return bad request email is empty", async () => {
-    const res = await request(app).post("/api/v1/auth/login").send({
-      email: "",
-    });
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toHaveProperty("error");
-  });
-  it("should return bad request email is not valid", async () => {
-    const res = await request(app).post("/api/v1/auth/login").send({
-      email: "hjgkl",
-    });
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toHaveProperty("error");
-  });
-  it("should return bad request password not exist", async () => {
-    const res = await request(app).post("/api/v1/auth/login").send({
-      email: "test@g.com",
-    });
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toHaveProperty("error");
-  });
-  it("should return bad request password length less 8", async () => {
-    const res = await request(app).post("/api/v1/auth/login").send({
-      email: "test@g.com",
-      password: "123456",
-    });
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toHaveProperty("error");
-  });
-
-  it("should return bad request password greather than 20", async () => {
-    const res = await request(app).post("/api/v1/auth/login").send({
-      email: "test@g.com",
-      name: "ahmed",
-      password: "123456789123456789123456789",
-    });
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toHaveProperty("error");
-  });
-  it("should return bad request email not exist", async () => {
-    const res = await request(app).post("/api/v1/auth/login").send({
-      email: "notexist@g.com",
-      password: "123456789",
-    });
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toHaveProperty("error");
-  });
-
-  it("should return bad request wrong password", async () => {
-    await request(app).post("/api/v1/auth/register").send({
-      email: "testlogin@g.com",
+  it("should return Unauthorized old refresh token", async () => {
+    const registerRes = await request(app).post("/api/v1/auth/register").send({
+      email: "login111111@g.com",
       password: "123456789",
       name: "ahmedlogin",
       role: "user",
     });
-    const res = await request(app).post("/api/v1/auth/login").send({
-      email: "testlogin@g.com",
-      password: "12345446789",
+    const loginRes = await request(app).post("/api/v1/auth/login").send({
+      email: "login111111@g.com",
+      password: "123456789",
+    });
+    const res = await request(app).post("/api/v1/auth/refresh-token").send({
+      refreshToken: registerRes.body.refreshToken,
     });
 
-    expect(res.statusCode).toEqual(404);
+    expect(res.statusCode).toEqual(401);
     expect(res.body).toHaveProperty("error");
   });
-  it("should register user successfully", async () => {
+
+  it("should return acesstoken & refreshToken successfully", async () => {
     await request(app).post("/api/v1/auth/register").send({
-      email: "testlogin1@g.com",
+      email: "refresh123@g.com",
       password: "123456789",
       name: "ahmedlogin",
       role: "user",
     });
-    const res = await request(app).post("/api/v1/auth/login").send({
-      email: "testlogin1@g.com",
+
+    const loginResult = await request(app).post("/api/v1/auth/login").send({
+      email: "refresh123@g.com",
       password: "123456789",
+    });
+    const res = await request(app).post("/api/v1/auth/refresh-token").send({
+      refreshToken: loginResult.body.refreshToken,
+    });
+
+    console.log(res.body);
+    expect(res.statusCode).toEqual(201);
+    expect(res.body).toHaveProperty("accessToken");
+    expect(res.body).toHaveProperty("refreshToken");
+  });
+});
+
+// test logout endpoint.
+describe("Post /api/v1/auth/logout", () => {
+  it("should logout succssfully", async () => {
+    const registerResponse = await request(app)
+      .post("/api/v1/auth/register")
+      .send({
+        email: "logout11@g.com",
+        password: "123456789",
+        name: "ahmedlogin",
+        role: "user",
+      });
+    const res = await request(app).post("/api/v1/auth/logout").send({
+      refreshToken: registerResponse.body.refreshToken,
+    });
+    expect(res.statusCode).toEqual(200);
+  });
+
+  it("should return bad request no body", async () => {
+    const res = await request(app).post("/api/v1/auth/logout").send({});
+    expect(res.statusCode).toEqual(400);
+    expect(res.body).toHaveProperty("error");
+  });
+
+  it("should return Unauthorized old refresh token", async () => {
+    const registerRes = await request(app).post("/api/v1/auth/register").send({
+      email: "logout1234@g.com",
+      password: "123456789",
+      name: "ahmedlogin",
+      role: "user",
+    });
+    const loginRes = await request(app).post("/api/v1/auth/login").send({
+      email: "logout1234@g.com",
+      password: "123456789",
+    });
+    const res = await request(app).post("/api/v1/auth/logout").send({
+      refreshToken: registerRes.body.refreshToken,
+    });
+
+    console.log(res.body);
+    expect(res.statusCode).toEqual(401);
+    expect(res.body).toHaveProperty("error");
+  });
+
+  it("should return acesstoken & refreshToken successfully", async () => {
+    await request(app).post("/api/v1/auth/register").send({
+      email: "refresh123456789@g.com",
+      password: "123456789",
+      name: "ahmedlogin",
+      role: "user",
+    });
+
+    const loginResult = await request(app).post("/api/v1/auth/login").send({
+      email: "refresh123456789@g.com",
+      password: "123456789",
+    });
+    const res = await request(app).post("/api/v1/auth/logout").send({
+      refreshToken: loginResult.body.refreshToken,
     });
 
     expect(res.statusCode).toEqual(200);
-    expect(res.body).toHaveProperty("accessToken");
-    expect(res.body).toHaveProperty("refreshToken");
   });
 });
