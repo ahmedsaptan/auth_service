@@ -2,27 +2,42 @@ version: "3"
 services:
   redis-server:
     image: "redis"
-  my-sql-server:
-    image: "mysql"
-    command: --default-authentication-plugin=mysql_native_password
-    restart: always
-    expose:
-      - "3306"
+    restart: unless-stopped
+    env_file: ./.env
     ports:
-      - "3306:3306"   
+      - $REDIS_LOCAL_PORT:$REDIS_DOCKER_PORT
+
+  my-sql-server:
+    image: mysql
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      - MYSQL_ROOT_PASSWORD=$MYSQLDB_ROOT_PASSWORD
+      - MYSQL_DATABASE=$MYSQLDB_DATABASE
+    ports:
+      - $MYSQLDB_LOCAL_PORT:$MYSQLDB_DOCKER_PORT
+    volumes:
+      - db:/var/lib/mysql
     environment:
       MYSQL_DATABASE: "db"
-      MYSQL_ROOT_PASSWORD: "password"
-    #ports:
-    # <Port exposed> : < MySQL Port running inside container>
-    # - "3306:3306"
-    expose:
-      # Opens port 3306 on the container
-      - "3306"
-    # Where our data will be persisted
+      MYSQL_ROOT_PASSWORD: "abc123"
+
   node-app-v1:
     depends_on:
-      - "my-sql-server"
+      - my-sql-server
+      - redis-server
     build: .
+    restart: unless-stopped
+    env_file: ./.env
     ports:
-      - "3000:3000"
+      - 3003:3000
+    environment:
+      - DB_HOST=my-sql-server
+      - DB_USER=$MYSQLDB_USER
+      - DB_PASSWORD=$MYSQLDB_ROOT_PASSWORD
+      - DB_NAME=$MYSQLDB_DATABASE
+      - DB_PORT=$MYSQLDB_DOCKER_PORT
+      - REDIS_HOST=redis-server
+      - REDIS_PORT=$REDIS_DOCKER_PORT
+volumes: 
+  db:

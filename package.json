@@ -7,7 +7,7 @@
     "dev": "nodemon  -r dotenv/config index.js",
     "start": "node index",
     "test": "jest",
-    "test:auth": "jest -t tests/auth.test.js",
+    "test:auth": "jest -i tests/auth.test.js",
     "test:product": "jest -i tests/product.test.js"
   },
   "keywords": [],
