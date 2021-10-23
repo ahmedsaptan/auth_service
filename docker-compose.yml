@@ -1,0 +1,28 @@
+version: "3"
+services:
+  redis-server:
+    image: "redis"
+  my-sql-server:
+    image: "mysql"
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    expose:
+      - "3306"
+    ports:
+      - "3306:3306"   
+    environment:
+      MYSQL_DATABASE: "db"
+      MYSQL_ROOT_PASSWORD: "password"
+    #ports:
+    # <Port exposed> : < MySQL Port running inside container>
+    # - "3306:3306"
+    expose:
+      # Opens port 3306 on the container
+      - "3306"
+    # Where our data will be persisted
+  node-app-v1:
+    depends_on:
+      - "my-sql-server"
+    build: .
+    ports:
+      - "3000:3000"
