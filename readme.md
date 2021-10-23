@@ -23,6 +23,7 @@ it will make the request & send accessToken in the headers, so server can extrac
 
 to run the app it is very easy, you can use docker-compose to run the app I used docker because I use MySQL as database & Redis for store refresh tokens
 
+
 ```bash
 docker-compose up
 ```
