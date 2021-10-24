@@ -2,6 +2,9 @@
 
 This is authorization and authentication that is responsible for registering users to the system, login, and logout out of the system, and responsible add permission to users & roles
 
+
+## System Desgin
+![system desgin](images/design.png)
 ## Authentication Phase
 
 How authentication work. i used jwt to auth users, user provide email,password,name and role > the server will validate the body of request then if it pass, server will create record fr this user then create two tokens **accessToken** & **refreshToken** why i used two
