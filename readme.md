@@ -24,6 +24,7 @@ it will make the request & send accessToken in the headers, so server can extrac
 to run the app it is very easy, you can use docker-compose to run the app I used docker because I use MySQL as database & Redis for store refresh tokens
 
 **i commit .env file for completeness**
+
 ```bash
 docker-compose up
 ```
@@ -33,7 +34,8 @@ server will run http://localhost:3000
 ## Testing
 
 i use jest & supertest run make unit test & write api test
-to run tests you can run one of the following commands. but before run these command must install deps & and some some env varabekes
+to run tests you can run one of the following commands. but before run these command must install deps & and some some env variables
+
 ```bash
 npm i
 ```
@@ -51,8 +53,6 @@ npm i
 - REDIS_PORT=6379
 ```
 
-
-
 then you can run tests commands.
 
 ```bash
@@ -66,5 +66,6 @@ npm run test:auth
 npm run test:product
 ```
 
-##  Postman collection
-here is postman collection This site was built using [Postman Collection](https://www.getpostman.com/collections/8481f3e15ddcce98a1d2).
+## Postman collection
+
+here is postman collection [Postman Collection](https://www.getpostman.com/collections/8481f3e15ddcce98a1d2).
