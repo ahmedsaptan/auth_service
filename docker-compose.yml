@@ -39,5 +39,6 @@ services:
       - DB_PORT=$MYSQLDB_DOCKER_PORT
       - REDIS_HOST=redis-server
       - REDIS_PORT=$REDIS_DOCKER_PORT
+
 volumes: 
   db:

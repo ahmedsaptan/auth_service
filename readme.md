@@ -33,7 +33,27 @@ server will run http://localhost:3000
 ## Testing
 
 i use jest & supertest run make unit test & write api test
-to run tests you can run one of the following commands
+to run tests you can run one of the following commands. but before run these command must install deps & and some some env varabekes
+```bash
+npm i
+```
+
+```bash
+# mysql
+- DB_HOST=localhost
+- DB_USER=root
+- DB_PASSWORD=abc123
+- DB_NAME=db
+- DB_PORT=3307
+
+# redis
+- REDIS_HOST=localhost
+- REDIS_PORT=6379
+```
+
+
+
+then you can run tests commands.
 
 ```bash
 # run all tests for the whole app
